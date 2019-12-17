@@ -30,7 +30,7 @@ Add this to your `Cargo.toml`:
 
 ```ini
 [dependencies]
-system_shutdown = "1.0.0"
+system_shutdown = "1.0.1"
 ```
 
 and this to your crate root:
