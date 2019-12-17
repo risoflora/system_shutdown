@@ -15,7 +15,6 @@ keywords = [
 categories = [
     'api-bindings',
     'hardware-support',
-    'os',
     'os::macos-apis',
     'os::unix-apis',
     'os::windows-apis',
