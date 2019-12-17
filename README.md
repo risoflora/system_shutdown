@@ -1,5 +1,19 @@
 # `system_shutdown`
 
+[![Build Status][travis-badge]][travis-url]
+[![Crates.io][crates-badge]][crates-url]
+[![Documentation][docs-badge]][docs-url]
+[![License][license-badge]][license-url]
+
+[travis-badge]: https://travis-ci.org/risoflora/system_shutdown.svg
+[travis-url]: https://travis-ci.org/risoflora/system_shutdown
+[crates-badge]: https://img.shields.io/crates/v/system_shutdown.svg
+[crates-url]: https://crates.io/crates/system_shutdown
+[docs-badge]: https://docs.rs/system_shutdown/badge.svg
+[docs-url]: https://docs.rs/system_shutdown
+[license-badge]: https://img.shields.io/crates/l/system_shutdown.svg
+[license-url]: https://github.com/risoflora/system_shutdown#license
+
 `system_shutdown` provides a cross platform way to shut down or reboot the machine.
 
 Supported platforms: Linux, Windows and MacOS.
