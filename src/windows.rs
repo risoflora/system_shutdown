@@ -1,4 +1,7 @@
+use std::ffi::OsStr;
+use std::iter::once;
 use std::mem;
+use std::os::windows::ffi::OsStrExt;
 use std::ptr;
 use winapi::shared::minwindef::{FALSE, TRUE, UINT};
 use winapi::shared::winerror::ERROR_SUCCESS;
@@ -8,9 +11,9 @@ use winapi::um::reason::{
     SHTDN_REASON_FLAG_PLANNED, SHTDN_REASON_MAJOR_OPERATINGSYSTEM, SHTDN_REASON_MINOR_UPGRADE,
 };
 use winapi::um::securitybaseapi::AdjustTokenPrivileges;
-use winapi::um::winbase::LookupPrivilegeValueA;
+use winapi::um::winbase::LookupPrivilegeValueW;
 use winapi::um::winnt::{
-    HANDLE, LPCSTR, SE_PRIVILEGE_ENABLED, SE_SHUTDOWN_NAME, TOKEN_ADJUST_PRIVILEGES,
+    HANDLE, LPWSTR, SE_PRIVILEGE_ENABLED, SE_SHUTDOWN_NAME, TOKEN_ADJUST_PRIVILEGES,
     TOKEN_PRIVILEGES, TOKEN_QUERY,
 };
 use winapi::um::winuser::{ExitWindowsEx, EWX_FORCEIFHUNG, EWX_REBOOT, EWX_SHUTDOWN};
@@ -25,9 +28,13 @@ fn exit_windows(mut flags: UINT, forced: bool) -> Option<i32> {
             &mut token,
         ) == TRUE
         {
-            LookupPrivilegeValueA(
+            let security_name: Vec<u16> = OsStr::new(SE_SHUTDOWN_NAME)
+                .encode_wide()
+                .chain(once(0))
+                .collect();
+            LookupPrivilegeValueW(
                 ptr::null(),
-                SE_SHUTDOWN_NAME.as_ptr() as LPCSTR,
+                security_name.as_ptr() as LPWSTR,
                 &mut tkp.Privileges[0].Luid,
             );
             tkp.PrivilegeCount = 1;
