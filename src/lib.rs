@@ -12,11 +12,10 @@
 //! use system_shutdown::shutdown;
 //!
 //! fn main() {
-//!     if shutdown(true) {
-//!         println!("Shutting down, bye!");
-//!     } else {
-//!         println!("Failed to shut down.");
-//!     }
+//!    match shutdown(true) {
+//!        None => println!("Shutting down, bye!"),
+//!        Some(code) => println!("Failed to shut down. (Os code: {})", code),
+//!    }
 //! }
 //! ```
 //!
@@ -38,7 +37,7 @@ mod os;
 /// # Arguments
 ///
 /// * `[in] forced` - Forces the machine to shut down instantly without confirmations.
-pub fn shutdown(forced: bool) -> bool {
+pub fn shutdown(forced: bool) -> Option<i32> {
     os::shutdown(forced)
 }
 
@@ -47,6 +46,6 @@ pub fn shutdown(forced: bool) -> bool {
 /// # Arguments
 ///
 /// * `[in] forced` - Forces the machine to reboot instantly without confirmations.
-pub fn reboot(forced: bool) -> bool {
+pub fn reboot(forced: bool) -> Option<i32> {
     os::reboot(forced)
 }

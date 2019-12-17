@@ -5,9 +5,8 @@ extern crate system_shutdown;
 use system_shutdown::reboot;
 
 fn main() {
-    if reboot(true) {
-        println!("Rebooting ...");
-    } else {
-        println!("Failed to reboot.");
+    match reboot(true) {
+        None => println!("Rebooting ..."),
+        Some(code) => println!("Failed to reboot. (Os code: {})", code),
     }
 }

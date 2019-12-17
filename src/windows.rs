@@ -15,7 +15,7 @@ use winapi::um::winnt::{
 };
 use winapi::um::winuser::{ExitWindowsEx, EWX_FORCEIFHUNG, EWX_REBOOT, EWX_SHUTDOWN};
 
-fn exit_windows(mut flags: UINT, forced: bool) -> bool {
+fn exit_windows(mut flags: UINT, forced: bool) -> Option<i32> {
     unsafe {
         let mut token: HANDLE = ptr::null_mut();
         let mut tkp: TOKEN_PRIVILEGES = mem::zeroed();
@@ -36,26 +36,32 @@ fn exit_windows(mut flags: UINT, forced: bool) -> bool {
             if forced {
                 flags |= EWX_FORCEIFHUNG;
             }
-            return GetLastError() == ERROR_SUCCESS
-                && ExitWindowsEx(
-                    flags,
-                    SHTDN_REASON_MAJOR_OPERATINGSYSTEM
-                        | SHTDN_REASON_MINOR_UPGRADE
-                        | SHTDN_REASON_FLAG_PLANNED,
-                ) == TRUE;
+            let err = GetLastError();
+            if err != ERROR_SUCCESS {
+                return Some(err as i32);
+            }
+            if ExitWindowsEx(
+                flags,
+                SHTDN_REASON_MAJOR_OPERATINGSYSTEM
+                    | SHTDN_REASON_MINOR_UPGRADE
+                    | SHTDN_REASON_FLAG_PLANNED,
+            ) == TRUE
+            {
+                return None;
+            }
         }
+        Some(GetLastError() as i32)
     }
-    false
 }
 
 /// Windows specific function to shut down the machine using the `ExitWindowsEx()` from `winuser` API.
 /// When `forced` is `true`, it uses the `EWX_FORCEIFHUNG` flag to shut down instantly without confirmations.
-pub fn shutdown(forced: bool) -> bool {
+pub fn shutdown(forced: bool) -> Option<i32> {
     exit_windows(EWX_SHUTDOWN, forced)
 }
 
 /// Windows specific function to reboot the machine using the `ExitWindowsEx()` from `winuser` API.
 /// When `forced` is `true`, it uses the `EWX_FORCEIFHUNG` flag to reboot instantly without confirmations.
-pub fn reboot(forced: bool) -> bool {
+pub fn reboot(forced: bool) -> Option<i32> {
     exit_windows(EWX_REBOOT, forced)
 }

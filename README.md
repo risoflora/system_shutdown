@@ -28,10 +28,9 @@ extern crate system_shutdown;
 use system_shutdown::shutdown;
 
 fn main() {
-    if shutdown(true) {
-        println!("Shutting down, bye!");
-    } else {
-        println!("Failed to shut down.");
+    match shutdown(true) {
+        None => println!("Shutting down, bye!"),
+        Some(code) => println!("Failed to shut down. (Os code: {})", code),
     }
 }
 ```
@@ -44,7 +43,7 @@ Add this to your `Cargo.toml`:
 
 ```ini
 [dependencies]
-system_shutdown = "1.0.1"
+system_shutdown = "2.0.0"
 ```
 
 and this to your crate root:
