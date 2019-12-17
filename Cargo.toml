@@ -13,10 +13,12 @@ keywords = [
     'reboot',
 ]
 categories = [
-    'system-shutdown',
-    'system-rebooting',
-    'machine-shutdown',
-    'machine-reboot',
+    'api-bindings',
+    'hardware-support',
+    'os',
+    'os::macos-apis',
+    'os::unix-apis',
+    'os::windows-apis',
 ]
 
 [dependencies]
