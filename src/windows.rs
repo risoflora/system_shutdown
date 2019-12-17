@@ -1,6 +1,6 @@
 use std::mem;
 use std::ptr;
-use winapi::shared::minwindef::{FALSE, TRUE};
+use winapi::shared::minwindef::{FALSE, TRUE, UINT};
 use winapi::shared::winerror::ERROR_SUCCESS;
 use winapi::um::errhandlingapi::GetLastError;
 use winapi::um::processthreadsapi::{GetCurrentProcess, OpenProcessToken};
@@ -15,9 +15,7 @@ use winapi::um::winnt::{
 };
 use winapi::um::winuser::{ExitWindowsEx, EWX_FORCEIFHUNG, EWX_REBOOT, EWX_SHUTDOWN};
 
-/// Windows specific function to shut down/restart the machine using the `ExitWindowsEx()` from `winuser` API.
-/// When `forced` is `true`, it uses the `EWX_FORCEIFHUNG` flag to process the user request instantly without confirmations.
-pub fn sys_shutdown(rebooting: bool, forced: bool) -> bool {
+fn exit_windows(mut flags: UINT, forced: bool) -> bool {
     unsafe {
         let mut token: HANDLE = ptr::null_mut();
         let mut tkp: TOKEN_PRIVILEGES = mem::zeroed();
@@ -35,7 +33,6 @@ pub fn sys_shutdown(rebooting: bool, forced: bool) -> bool {
             tkp.PrivilegeCount = 1;
             tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
             AdjustTokenPrivileges(token, FALSE, &mut tkp, 0, ptr::null_mut(), ptr::null_mut());
-            let mut flags = if rebooting { EWX_REBOOT } else { EWX_SHUTDOWN };
             if forced {
                 flags |= EWX_FORCEIFHUNG;
             }
@@ -49,4 +46,16 @@ pub fn sys_shutdown(rebooting: bool, forced: bool) -> bool {
         }
     }
     false
+}
+
+/// Windows specific function to shut down the machine using the `ExitWindowsEx()` from `winuser` API.
+/// When `forced` is `true`, it uses the `EWX_FORCEIFHUNG` flag to shut down instantly without confirmations.
+pub fn shutdown(forced: bool) -> bool {
+    exit_windows(EWX_SHUTDOWN, forced)
+}
+
+/// Windows specific function to reboot the machine using the `ExitWindowsEx()` from `winuser` API.
+/// When `forced` is `true`, it uses the `EWX_FORCEIFHUNG` flag to reboot instantly without confirmations.
+pub fn reboot(forced: bool) -> bool {
+    exit_windows(EWX_REBOOT, forced)
 }

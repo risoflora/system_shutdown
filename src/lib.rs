@@ -39,7 +39,7 @@ mod os;
 ///
 /// * `[in] forced` - Forces the machine to shut down instantly without confirmations.
 pub fn shutdown(forced: bool) -> bool {
-    os::sys_shutdown(false, forced)
+    os::shutdown(forced)
 }
 
 /// Calls the OS-specific function to reboot the machine.
@@ -48,5 +48,5 @@ pub fn shutdown(forced: bool) -> bool {
 ///
 /// * `[in] forced` - Forces the machine to reboot instantly without confirmations.
 pub fn reboot(forced: bool) -> bool {
-    os::sys_shutdown(true, forced)
+    os::reboot(forced)
 }
