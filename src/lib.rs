@@ -25,7 +25,7 @@
 extern crate winapi;
 
 #[cfg(any(target_os = "linux", target_os = "macos"))]
-#[path = "unix.rs"]
+#[path = "linux.rs"]
 mod os;
 
 #[cfg(target_os = "windows")]
