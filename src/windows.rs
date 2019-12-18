@@ -72,3 +72,9 @@ pub fn shutdown(forced: bool) -> Option<i32> {
 pub fn reboot(forced: bool) -> Option<i32> {
     exit_windows(EWX_REBOOT, forced)
 }
+
+/// Windows specific function to log out the system using the `ExitWindowsEx()` from `winuser` API.
+/// When `forced` is `true`, it uses the `EWX_FORCEIFHUNG` flag to log out instantly without confirmations.
+pub fn logout(forced: bool) -> Option<i32> {
+    exit_windows(EWX_LOGOFF, forced)
+}

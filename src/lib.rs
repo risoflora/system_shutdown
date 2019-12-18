@@ -49,3 +49,12 @@ pub fn shutdown(forced: bool) -> Option<i32> {
 pub fn reboot(forced: bool) -> Option<i32> {
     os::reboot(forced)
 }
+
+/// Calls the OS-specific function to log out the system.
+///
+/// # Arguments
+///
+/// * `[in] forced` - Forces the machine to log out instantly without confirmations.
+pub fn logout(forced: bool) -> Option<i32> {
+    os::logout(forced)
+}
