@@ -14,7 +14,7 @@
 [license-badge]: https://img.shields.io/crates/l/system_shutdown.svg
 [license-url]: https://github.com/risoflora/system_shutdown#license
 
-`system_shutdown` provides a cross platform way to shut down or reboot the machine.
+`system_shutdown` provides a cross platform way to shut down, reboot or log out the system.
 
 Supported platforms: Linux, Windows and MacOS.
 
@@ -43,7 +43,7 @@ Add this to your `Cargo.toml`:
 
 ```ini
 [dependencies]
-system_shutdown = "2.0.1"
+system_shutdown = "2.1.0"
 ```
 
 and this to your crate root:

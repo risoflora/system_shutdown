@@ -16,7 +16,7 @@ use winapi::um::winnt::{
     HANDLE, LPWSTR, SE_PRIVILEGE_ENABLED, SE_SHUTDOWN_NAME, TOKEN_ADJUST_PRIVILEGES,
     TOKEN_PRIVILEGES, TOKEN_QUERY,
 };
-use winapi::um::winuser::{ExitWindowsEx, EWX_FORCEIFHUNG, EWX_REBOOT, EWX_SHUTDOWN};
+use winapi::um::winuser::{ExitWindowsEx, EWX_FORCEIFHUNG, EWX_LOGOFF, EWX_REBOOT, EWX_SHUTDOWN};
 
 fn exit_windows(mut flags: UINT, forced: bool) -> Option<i32> {
     unsafe {
