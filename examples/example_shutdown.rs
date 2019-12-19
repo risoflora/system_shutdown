@@ -5,8 +5,8 @@ extern crate system_shutdown;
 use system_shutdown::shutdown;
 
 fn main() {
-    match shutdown(true) {
-        None => println!("Shutting down, bye!"),
-        Some(code) => println!("Failed to shut down. (Os code: {})", code),
+    match shutdown() {
+        Ok(_) => println!("Shutting down, bye!"),
+        Err(error) => eprintln!("Failed to shut down: {}", error),
     }
 }

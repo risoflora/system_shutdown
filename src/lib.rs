@@ -1,4 +1,4 @@
-//! `system_shutdown` provides a cross platform way to shut down or reboot the machine.
+//! `system_shutdown` provides a cross platform way to shut down, reboot or log out operations.
 //!
 //! Supported platforms: Linux, Windows and MacOS.
 //!
@@ -12,14 +12,14 @@
 //! use system_shutdown::shutdown;
 //!
 //! fn main() {
-//!    match shutdown(true) {
-//!        None => println!("Shutting down, bye!"),
-//!        Some(code) => println!("Failed to shut down. (Os code: {})", code),
-//!    }
+//!     match shutdown() {
+//!         Ok(_) => println!("Shutting down, bye!"),
+//!         Err(error) => eprintln!("Failed to shut down: {}", error),
+//!     }
 //! }
 //! ```
 //!
-//! In most of the systems it does not require the user to be root/admin.
+//! In most of the systems it does not requires the user to be root/admin.
 
 #[cfg(target_os = "windows")]
 extern crate winapi;
@@ -32,29 +32,48 @@ mod os;
 #[path = "windows.rs"]
 mod os;
 
+use std::io;
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! not_implemented {
+    () => {
+        Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "feature not implemented yet",
+        ))
+    };
+}
+
+/// A specialized `Result` type for shut down, reboot and log out operations.
+pub type ShutdownResult = io::Result<()>;
+
 /// Calls the OS-specific function to shut down the machine.
-///
-/// # Arguments
-///
-/// * `[in] forced` - Forces the machine to shut down instantly without confirmations.
-pub fn shutdown(forced: bool) -> Option<i32> {
-    os::shutdown(forced)
+pub fn shutdown() -> ShutdownResult {
+    os::shutdown()
+}
+
+/// Calls the OS-specific function to force to shut down the machine.
+pub fn force_shutdown() -> ShutdownResult {
+    os::force_shutdown()
 }
 
 /// Calls the OS-specific function to reboot the machine.
-///
-/// # Arguments
-///
-/// * `[in] forced` - Forces the machine to reboot instantly without confirmations.
-pub fn reboot(forced: bool) -> Option<i32> {
-    os::reboot(forced)
+pub fn reboot() -> ShutdownResult {
+    os::reboot()
 }
 
-/// Calls the OS-specific function to log out the system.
-///
-/// # Arguments
-///
-/// * `[in] forced` - Forces the machine to log out instantly without confirmations.
-pub fn logout(forced: bool) -> Option<i32> {
-    os::logout(forced)
+/// Calls the OS-specific function to force to reboot the machine.
+pub fn force_reboot() -> ShutdownResult {
+    os::force_reboot()
+}
+
+/// Calls the OS-specific function to log out the user.
+pub fn logout() -> ShutdownResult {
+    os::logout()
+}
+
+/// Calls the OS-specific function to force to log out the user.
+pub fn force_logout() -> ShutdownResult {
+    os::force_logout()
 }

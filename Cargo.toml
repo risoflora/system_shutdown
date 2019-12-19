@@ -1,9 +1,9 @@
 [package]
 name = 'system_shutdown'
-version = '2.1.0'
+version = '3.0.0'
 authors = ['Silvio Clecio (silvioprog) <silvioprog@gmail.com>']
 license = 'MIT/Apache-2.0'
-description = 'Rust library for shut down, reboot or log out the system.'
+description = 'Rust library for shut down, reboot or log out operations.'
 homepage = 'https://github.com/risoflora/system_shutdown'
 repository = 'https://github.com/risoflora/system_shutdown'
 readme = 'README.md'
