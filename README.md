@@ -14,7 +14,7 @@
 [license-badge]: https://img.shields.io/crates/l/system_shutdown.svg
 [license-url]: https://github.com/risoflora/system_shutdown#license
 
-`system_shutdown` provides a cross platform way to shut down, reboot or log out the system.
+`system_shutdown` provides a cross platform way to shut down, reboot or log out operations.
 
 Supported platforms: Linux, Windows and MacOS.
 
@@ -28,14 +28,14 @@ extern crate system_shutdown;
 use system_shutdown::shutdown;
 
 fn main() {
-    match shutdown(true) {
-        None => println!("Shutting down, bye!"),
-        Some(code) => println!("Failed to shut down. (Os code: {})", code),
+    match shutdown() {
+        Ok(_) => println!("Shutting down, bye!"),
+        Err(error) => eprintln!("Failed to shut down: {}", error),
     }
 }
 ```
 
-In most of the systems it does not require the user to be root/admin.
+In most of the systems it does not requires the user to be root/admin.
 
 ## Usage
 
@@ -43,7 +43,7 @@ Add this to your `Cargo.toml`:
 
 ```ini
 [dependencies]
-system_shutdown = "2.1.0"
+system_shutdown = "3.0.0"
 ```
 
 and this to your crate root:
@@ -54,7 +54,7 @@ extern crate system_shutdown;
 
 ## Contributions
 
-Pull Requests and Issues welcome!
+Pull Requests and Issues are welcome!
 
 ## License
 
