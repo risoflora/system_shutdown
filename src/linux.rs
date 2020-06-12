@@ -1,5 +1,6 @@
-use std::io::{Error, ErrorKind};
+use std::io::{Write, Error, ErrorKind};
 use std::process::Command;
+use std::fs::File;
 
 use not_implemented;
 use ShutdownResult;
@@ -31,7 +32,6 @@ pub fn shutdown() -> ShutdownResult {
     perform_shutdown(false)
 }
 
-#[doc(hidden)]
 pub fn force_shutdown() -> ShutdownResult {
     not_implemented!()
 }
@@ -41,9 +41,15 @@ pub fn reboot() -> ShutdownResult {
     perform_shutdown(true)
 }
 
-#[doc(hidden)]
+/// Linux specific function to force reboot the machine using the magic SysRq key.
 pub fn force_reboot() -> ShutdownResult {
-    not_implemented!()
+    // Enable the use of the magic SysRq option
+    let mut file = File::create("/proc/sys/kernel/sysrq").unwrap();
+    writeln!(&mut file, "1").unwrap();
+
+    // Reboot the machine
+    let mut file = File::create("/proc/sysrq-trigger").unwrap();
+    writeln!(&mut file, "b").unwrap();
 }
 
 #[doc(hidden)]
