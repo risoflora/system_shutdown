@@ -32,6 +32,7 @@ pub fn shutdown() -> ShutdownResult {
     perform_shutdown(false)
 }
 
+#[doc(hidden)]
 pub fn force_shutdown() -> ShutdownResult {
     not_implemented!()
 }
