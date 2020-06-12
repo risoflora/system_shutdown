@@ -45,12 +45,12 @@ pub fn reboot() -> ShutdownResult {
 /// Linux specific function to force reboot the machine using the magic SysRq key.
 pub fn force_reboot() -> ShutdownResult {
     // Enable the use of the magic SysRq option
-    let mut file = File::create("/proc/sys/kernel/sysrq").unwrap();
-    writeln!(&mut file, "1").unwrap();
+    let mut file = File::create("/proc/sys/kernel/sysrq")?;
+    writeln!(&mut file, "1")?;
 
     // Reboot the machine
-    let mut file = File::create("/proc/sysrq-trigger").unwrap();
-    writeln!(&mut file, "b").unwrap();
+    let mut file = File::create("/proc/sysrq-trigger")?;
+    writeln!(&mut file, "b")?;
 
     Ok(())
 }
