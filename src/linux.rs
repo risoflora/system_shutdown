@@ -15,7 +15,7 @@ fn perform_shutdown(rebooting: bool) -> ShutdownResult {
     cmd.arg("now");
     match cmd.output() {
         Ok(output) => {
-            if output.status.success() && output.stderr.len() == 0 {
+            if output.status.success() && output.stderr.is_empty() {
                 return Ok(());
             }
             Err(Error::new(
@@ -50,6 +50,8 @@ pub fn force_reboot() -> ShutdownResult {
     // Reboot the machine
     let mut file = File::create("/proc/sysrq-trigger").unwrap();
     writeln!(&mut file, "b").unwrap();
+
+    Ok(())
 }
 
 #[doc(hidden)]
