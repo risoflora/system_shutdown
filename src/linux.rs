@@ -1,6 +1,6 @@
-use std::io::{Write, Error, ErrorKind};
-use std::process::Command;
 use std::fs::File;
+use std::io::{Error, ErrorKind, Write};
+use std::process::Command;
 
 use not_implemented;
 use ShutdownResult;
