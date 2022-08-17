@@ -24,9 +24,9 @@ fn invoke_script(script: &str) -> ShutdownResult {
 
 /// MacOS requires to explicitly allow the application to call "System Events". If you want to use this crate in an unattended way (automation etc.),
 /// you may want to ask for permission beforehand to allow this app to call "System Events".
-/// This function requests the "System Events" to press the Shift key, which should be a fairly safe operation.
+/// This function requests the "System Events" to "stop current screen saver", which should be a fairly safe operation.
 pub fn request_permission_dialog() -> ShutdownResult {
-    invoke_script("tell application \"System Events\" to keystroke key code 16")
+    invoke_script("tell application \"System Events\" to stop current screen saver")
 }
 
 /// MacOS specific function to reboot without showing a confirmation dialog using AppleScript and "System Events" call "shut down"
