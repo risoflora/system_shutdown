@@ -29,7 +29,7 @@ pub fn request_permission_dialog() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to stop current screen saver")
 }
 
-/// MacOS specific function to reboot without showing a confirmation dialog using AppleScript and "System Events" call "shut down"
+/// MacOS specific function to shut down the system using AppleScript and "System Events" call "shut down"
 /// First time you use this, MacOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
 pub fn shutdown() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to shut down")
@@ -40,7 +40,7 @@ pub fn force_shutdown() -> ShutdownResult {
     not_implemented!()
 }
 
-/// MacOS specific function to reboot without showing a confirmation dialog using AppleScript and "System Events" call "restart"
+/// MacOS specific function to reboot using AppleScript and "System Events" call "restart"
 /// First time you use this, MacOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
 pub fn reboot() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to restart")
