@@ -51,7 +51,7 @@ fn get_session_id() -> String {
     session
 }
 
-/// Linux specific function to shut down the machine using the D-BUS method call.
+/// Linux specific function to shut down the machine using D-BUS method call.
 /// The following D-BUS calls are attempted:
 /// - org.gnome.SessionManager.Shutdown()
 /// - org.kde.KSMServerInterface.logout(-1, 2, 2)
@@ -83,7 +83,7 @@ pub fn force_shutdown() -> ShutdownResult {
     not_implemented!()
 }
 
-/// Linux specific function to reboot the machine using the D-BUS method call.
+/// Linux specific function to reboot the machine using D-BUS method call.
 /// The following D-BUS calls are attempted:
 /// - org.gnome.SessionManager.Reboot()
 /// - org.kde.KSMServerInterface.logout(-1, 1, 2)
@@ -120,7 +120,7 @@ pub fn force_reboot() -> ShutdownResult {
     Ok(())
 }
 
-/// Linux specific function to log out the user using the D-BUS method call.
+/// Linux specific function to log out the user using D-BUS method call.
 /// The following D-BUS calls are attempted:
 /// - org.gnome.SessionManager.Logout(1)
 /// - org.kde.KSMServerInterface.logout(-1, 0, 2)
@@ -148,7 +148,7 @@ pub fn force_logout() -> ShutdownResult {
     not_implemented!()
 }
 
-/// Linux specific function to log out the user using the D-BUS method call.
+/// Linux specific function to put the machine to sleep using D-BUS method call.
 /// The following D-BUS calls are attempted:
 /// - org.xfce.SessionManager.Suspend()
 /// - org.freedesktop.login1.Manager.Suspend(true)
@@ -165,7 +165,7 @@ pub fn sleep() -> ShutdownResult {
     run_command("systemctl", &["suspend"])
 }
 
-/// Linux specific function to log out the user using the D-BUS method call.
+/// Linux specific function to hibernate the machine using D-BUS method call.
 /// The following D-BUS calls are attempted:
 /// - org.xfce.SessionManager.Hibernate()
 /// - org.freedesktop.login1.Manager.Hibernate(true)
