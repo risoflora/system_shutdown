@@ -22,7 +22,7 @@ categories = [
 ]
 
 [target.'cfg(target_os = "linux")'.dependencies]
-"zbus" = "2.3.2"
+"zbus" = "3.0.0"
 
 [target.'cfg(target_os = "windows")'.dependencies.windows]
 version = '0.39.0'
