@@ -1,6 +1,5 @@
 use std::io::Error;
 use std::mem;
-use std::ptr;
 use windows::{
     core::{PCWSTR, HSTRING},
     Win32::{
@@ -44,7 +43,7 @@ fn request_privileges() -> ShutdownResult {
         }
         tkp.PrivilegeCount = 1;
         tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if !AdjustTokenPrivileges(token, false, Some(&tkp), None, None).as_bool() {
+        if !AdjustTokenPrivileges(token, false, Some(&tkp), 0, None, None).as_bool() {
             return last_os_error!();
         }
     }
