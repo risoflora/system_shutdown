@@ -43,13 +43,7 @@ Add this to your `Cargo.toml`:
 
 ```ini
 [dependencies]
-system_shutdown = "3.0.0"
-```
-
-and this to your crate root:
-
-```rust
-extern crate system_shutdown;
+system_shutdown = "4.0.0"
 ```
 
 ## Contributions

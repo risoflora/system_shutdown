@@ -7,8 +7,6 @@
 //! The example below shows how to shut down the machine:
 //!
 //! ```rust
-//! extern crate system_shutdown;
-//!
 //! use system_shutdown::shutdown;
 //!
 //! fn main() {
@@ -21,16 +19,21 @@
 //!
 //! In most of the systems it does not requires the user to be root/admin.
 
-#[cfg(target_os = "windows")]
-extern crate winapi;
-
-#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[cfg(target_os = "linux")]
 #[path = "linux.rs"]
 mod os;
+
+#[cfg(target_os = "macos")]
+#[path = "macos.rs"]
+mod os;
+#[cfg(target_os = "macos")]
+pub use os::request_permission_dialog;
 
 #[cfg(target_os = "windows")]
 #[path = "windows.rs"]
 mod os;
+#[cfg(target_os = "windows")]
+pub use os::{shutdown_with_message, reboot_with_message};
 
 use std::io;
 
@@ -76,4 +79,14 @@ pub fn logout() -> ShutdownResult {
 /// Calls the OS-specific function to force to log out the user.
 pub fn force_logout() -> ShutdownResult {
     os::force_logout()
+}
+
+/// Calls the OS-specific function to put the machine to sleep.
+pub fn sleep() -> ShutdownResult {
+    os::sleep()
+}
+
+/// Calls the OS-specific function to hibernate the machine.
+pub fn hibernate() -> ShutdownResult {
+    os::hibernate()
 }
