@@ -38,7 +38,7 @@ fn request_privileges() -> ShutdownResult {
         if !OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &mut token).as_bool() {
             return last_os_error!();
         }
-        if !LookupPrivilegeValueW(PCWSTR::null(), PCWSTR::from(&HSTRING::from(SE_SHUTDOWN_NAME)), &mut tkp.Privileges[0].Luid).as_bool() {
+        if !LookupPrivilegeValueW(PCWSTR::null(), SE_SHUTDOWN_NAME, &mut tkp.Privileges[0].Luid).as_bool() {
             return last_os_error!();
         }
         tkp.PrivilegeCount = 1;
@@ -75,7 +75,7 @@ fn initiate_system_shutdown(message: &str, timeout: u32, force_close_apps: bool,
 fn set_suspend_state(hibernate: bool) -> ShutdownResult {
     unsafe {
         request_privileges()?;
-        if SetSuspendState(BOOLEAN(if hibernate { 1 } else { 0 }), BOOLEAN(0), BOOLEAN(0)).0 == 0 {
+        if SetSuspendState(BOOLEAN::from(hibernate), BOOLEAN(0), BOOLEAN(0)).0 == 0 {
             return last_os_error!();
         }
     }
