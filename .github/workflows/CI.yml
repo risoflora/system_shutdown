@@ -1,0 +1,66 @@
+######################################################################
+# Copyright (c) 2022 Silvio Clecio (silvioprog) <silvioprog@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+######################################################################
+
+name: CI/CD
+
+on: [push, pull_request]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: ${{ matrix.job.target }}
+    runs-on: ${{ matrix.job.os }}
+
+    strategy:
+      matrix:
+        job:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-22.04
+            test: false
+            publish: true
+
+          - target: x86_64-apple-darwin
+            test: false
+            os: macos-11
+
+          - target: aarch64-apple-darwin
+            os: macos-11
+
+          - target: x86_64-pc-windows-msvc
+            test: false
+            os: windows-2022
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+
+      - name: Cargo build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.job.target }}
+
+      - name: Cargo test
+        if: matrix.job.test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --target ${{ matrix.job.target }}
+
+      - name: Cargo publish
+        if: startsWith(github.ref, 'refs/tags/') && matrix.job.publish
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --token ${{ secrets.CARGO_TOKEN }} -v

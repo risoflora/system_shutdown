@@ -22,15 +22,15 @@ fn invoke_script(script: &str) -> ShutdownResult {
     }
 }
 
-/// MacOS requires to explicitly allow the application to call "System Events". If you want to use this crate in an unattended way (automation etc.),
+/// macOS requires to explicitly allow the application to call "System Events". If you want to use this crate in an unattended way (automation etc.),
 /// you may want to ask for permission beforehand to allow this app to call "System Events".
 /// This function requests the "System Events" to "stop current screen saver", which should be a fairly safe operation.
 pub fn request_permission_dialog() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to stop current screen saver")
 }
 
-/// MacOS specific function to shut down the system using AppleScript and "System Events" call "shut down"
-/// First time you use this, MacOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
+/// macOS specific function to shut down the system using AppleScript and "System Events" call "shut down"
+/// First time you use this, macOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
 pub fn shutdown() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to shut down")
 }
@@ -40,8 +40,8 @@ pub fn force_shutdown() -> ShutdownResult {
     not_implemented!()
 }
 
-/// MacOS specific function to reboot using AppleScript and "System Events" call "restart"
-/// First time you use this, MacOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
+/// macOS specific function to reboot using AppleScript and "System Events" call "restart"
+/// First time you use this, macOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
 pub fn reboot() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to restart")
 }
@@ -56,19 +56,19 @@ pub fn force_reboot() -> ShutdownResult {
     Ok(())
 }
 
-/// MacOS specific function to logout with a confirmation dialog using AppleScript and "System Events" call "log out".
-/// First time you use this, MacOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
+/// macOS specific function to logout with a confirmation dialog using AppleScript and "System Events" call "log out".
+/// First time you use this, macOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
 pub fn logout() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to log out")
 }
 
-/// MacOS specific function to force logout without showing a confirmation dialog using AppleScript and "loginwindow" call "«event aevtrlgo»"
+/// macOS specific function to force logout without showing a confirmation dialog using AppleScript and "loginwindow" call "«event aevtrlgo»"
 pub fn force_logout() -> ShutdownResult {
     invoke_script("tell application \"loginwindow\" to «event aevtrlgo»")
 }
 
-/// MacOS specific function to put the machine to sleep using AppleScript and "System Events" call "sleep"
-/// First time you use this, MacOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
+/// macOS specific function to put the machine to sleep using AppleScript and "System Events" call "sleep"
+/// First time you use this, macOS will ask for a permission. If you want to ask for a permission beforehand, use [`request_permission_dialog`]
 pub fn sleep() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to sleep")
 }

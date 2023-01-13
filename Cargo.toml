@@ -7,12 +7,7 @@ description = 'Rust library for shut down, reboot or log out operations.'
 homepage = 'https://github.com/risoflora/system_shutdown'
 repository = 'https://github.com/risoflora/system_shutdown'
 readme = 'README.md'
-edition = '2021'
-keywords = [
-    'system',
-    'shutdown',
-    'reboot',
-]
+keywords = ['system', 'shutdown', 'reboot']
 categories = [
     'api-bindings',
     'hardware-support',
@@ -20,6 +15,7 @@ categories = [
     'os::unix-apis',
     'os::windows-apis',
 ]
+edition = '2021'
 
 [target.'cfg(target_os = "linux")'.dependencies]
 "zbus" = "3.7.0"
@@ -34,5 +30,5 @@ features = [
     'Win32_System_Shutdown',
     'Win32_System_Power',
     'Win32_System_SystemServices',
-    'Win32_UI_WindowsAndMessaging'
+    'Win32_UI_WindowsAndMessaging',
 ]
