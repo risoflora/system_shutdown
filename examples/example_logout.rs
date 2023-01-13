@@ -1,7 +1,5 @@
 //! How to log out the user.
 
-extern crate system_shutdown;
-
 use system_shutdown::logout;
 
 fn main() {

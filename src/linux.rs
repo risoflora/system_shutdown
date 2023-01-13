@@ -10,13 +10,25 @@ use zbus::zvariant::DynamicType;
 
 fn name_has_owner(name: &str) -> bool {
     if let Ok(conn) = zbus::blocking::Connection::session() {
-        let reply = conn.call_method(Some("org.freedesktop.DBus"), "/", Some("org.freedesktop.DBus"), "NameHasOwner", &(name));
+        let reply = conn.call_method(
+            Some("org.freedesktop.DBus"),
+            "/",
+            Some("org.freedesktop.DBus"),
+            "NameHasOwner",
+            &(name),
+        );
         return reply.and_then(|r| r.body()).unwrap_or(false);
     }
     false
 }
 
-fn dbus_send<B: Serialize + DynamicType>(destination: &str, path: &str, interface: &str, method: &str, body: &B) -> bool {
+fn dbus_send<B: Serialize + DynamicType>(
+    destination: &str,
+    path: &str,
+    interface: &str,
+    method: &str,
+    body: &B,
+) -> bool {
     if name_has_owner(destination) {
         if let Ok(conn) = zbus::blocking::Connection::session() {
             let reply = conn.call_method(Some(destination), path, Some(interface), method, body);
@@ -46,7 +58,10 @@ fn run_command(command: &str, args: &[&str]) -> ShutdownResult {
 fn get_session_id() -> String {
     let mut session = std::env::var("XDG_SESSION_ID").unwrap_or_default();
     if session.is_empty() {
-        session = std::fs::read_to_string("/proc/self/sessionid").unwrap_or_default().trim().to_string();
+        session = std::fs::read_to_string("/proc/self/sessionid")
+            .unwrap_or_default()
+            .trim()
+            .to_string();
     }
     session
 }
@@ -64,15 +79,87 @@ fn get_session_id() -> String {
 /// - org.freedesktop.systemd1.Manager.PowerOff()
 /// If nothing works up to this point, as a last resort this function calls `shutdown -h now`
 pub fn shutdown() -> ShutdownResult {
-    if dbus_send("org.gnome.SessionManager",          "/org/gnome/SessionManager",             "org.gnome.SessionManager",                         "Shutdown", &())         { return Ok(()); }
-    if dbus_send("org.kde.ksmserver",                 "/KSMServer",                            "org.kde.KSMServerInterface",                       "logout",   &(-1, 2, 2)) { return Ok(()); }
-    if dbus_send("org.xfce.SessionManager",           "/org/xfce/SessionManager",              "org.xfce.SessionManager",                          "Shutdown", &(true))     { return Ok(()); } // allow_save - true
-    if dbus_send("org.freedesktop.login1",            "/org/freedesktop/login1",               "org.freedesktop.login1.Manager",                   "PowerOff", &(true))     { return Ok(()); } // interactive - true
-    if dbus_send("org.freedesktop.PowerManagement",   "/org/freedesktop/PowerManagement",      "org.freedesktop.PowerManagement",                  "Shutdown", &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.SessionManagement", "/org/freedesktop/SessionManagement",    "org.freedesktop.SessionManagement",                "Shutdown", &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.ConsoleKit",        "/org/freedesktop/ConsoleKit/Manager",   "org.freedesktop.ConsoleKit.Manager",               "Stop",     &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.Hal",               "/org/freedesktop/Hal/devices/computer", "org.freedesktop.Hal.Device.SystemPowerManagement", "Shutdown", &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.systemd1",          "/org/freedesktop/systemd1",             "org.freedesktop.systemd1.Manager",                 "PowerOff", &())         { return Ok(()); }
+    if dbus_send(
+        "org.gnome.SessionManager",
+        "/org/gnome/SessionManager",
+        "org.gnome.SessionManager",
+        "Shutdown",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.kde.ksmserver",
+        "/KSMServer",
+        "org.kde.KSMServerInterface",
+        "logout",
+        &(-1, 2, 2),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.xfce.SessionManager",
+        "/org/xfce/SessionManager",
+        "org.xfce.SessionManager",
+        "Shutdown",
+        &(true),
+    ) {
+        return Ok(());
+    } // allow_save - true
+    if dbus_send(
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        "org.freedesktop.login1.Manager",
+        "PowerOff",
+        &(true),
+    ) {
+        return Ok(());
+    } // interactive - true
+    if dbus_send(
+        "org.freedesktop.PowerManagement",
+        "/org/freedesktop/PowerManagement",
+        "org.freedesktop.PowerManagement",
+        "Shutdown",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.SessionManagement",
+        "/org/freedesktop/SessionManagement",
+        "org.freedesktop.SessionManagement",
+        "Shutdown",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.ConsoleKit",
+        "/org/freedesktop/ConsoleKit/Manager",
+        "org.freedesktop.ConsoleKit.Manager",
+        "Stop",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.Hal",
+        "/org/freedesktop/Hal/devices/computer",
+        "org.freedesktop.Hal.Device.SystemPowerManagement",
+        "Shutdown",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.systemd1",
+        "/org/freedesktop/systemd1",
+        "org.freedesktop.systemd1.Manager",
+        "PowerOff",
+        &(),
+    ) {
+        return Ok(());
+    }
 
     // As a last resort
     run_command("shutdown", &["-h", "now"])
@@ -96,15 +183,87 @@ pub fn force_shutdown() -> ShutdownResult {
 /// - org.freedesktop.systemd1.Manager.Reboot()
 /// If nothing works up to this point, as a last resort this function calls `shutdown -r now`
 pub fn reboot() -> ShutdownResult {
-    if dbus_send("org.gnome.SessionManager",          "/org/gnome/SessionManager",             "org.gnome.SessionManager",                         "Reboot",  &())         { return Ok(()); }
-    if dbus_send("org.kde.ksmserver",                 "/KSMServer",                            "org.kde.KSMServerInterface",                       "logout",  &(-1, 1, 2)) { return Ok(()); }
-    if dbus_send("org.xfce.SessionManager",           "/org/xfce/SessionManager",              "org.xfce.SessionManager",                          "Restart", &(true))     { return Ok(()); } // allow_save - true
-    if dbus_send("org.freedesktop.login1",            "/org/freedesktop/login1",               "org.freedesktop.login1.Manager",                   "Reboot",  &(true))     { return Ok(()); } // interactive - true
-    if dbus_send("org.freedesktop.PowerManagement",   "/org/freedesktop/PowerManagement",      "org.freedesktop.PowerManagement",                  "Reboot",  &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.SessionManagement", "/org/freedesktop/SessionManagement",    "org.freedesktop.SessionManagement",                "Reboot",  &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.ConsoleKit",        "/org/freedesktop/ConsoleKit/Manager",   "org.freedesktop.ConsoleKit.Manager",               "Restart", &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.Hal",               "/org/freedesktop/Hal/devices/computer", "org.freedesktop.Hal.Device.SystemPowerManagement", "Reboot",  &())         { return Ok(()); }
-    if dbus_send("org.freedesktop.systemd1",          "/org/freedesktop/systemd1",             "org.freedesktop.systemd1.Manager",                 "Reboot",  &())         { return Ok(()); }
+    if dbus_send(
+        "org.gnome.SessionManager",
+        "/org/gnome/SessionManager",
+        "org.gnome.SessionManager",
+        "Reboot",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.kde.ksmserver",
+        "/KSMServer",
+        "org.kde.KSMServerInterface",
+        "logout",
+        &(-1, 1, 2),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.xfce.SessionManager",
+        "/org/xfce/SessionManager",
+        "org.xfce.SessionManager",
+        "Restart",
+        &(true),
+    ) {
+        return Ok(());
+    } // allow_save - true
+    if dbus_send(
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        "org.freedesktop.login1.Manager",
+        "Reboot",
+        &(true),
+    ) {
+        return Ok(());
+    } // interactive - true
+    if dbus_send(
+        "org.freedesktop.PowerManagement",
+        "/org/freedesktop/PowerManagement",
+        "org.freedesktop.PowerManagement",
+        "Reboot",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.SessionManagement",
+        "/org/freedesktop/SessionManagement",
+        "org.freedesktop.SessionManagement",
+        "Reboot",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.ConsoleKit",
+        "/org/freedesktop/ConsoleKit/Manager",
+        "org.freedesktop.ConsoleKit.Manager",
+        "Restart",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.Hal",
+        "/org/freedesktop/Hal/devices/computer",
+        "org.freedesktop.Hal.Device.SystemPowerManagement",
+        "Reboot",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.systemd1",
+        "/org/freedesktop/systemd1",
+        "org.freedesktop.systemd1.Manager",
+        "Reboot",
+        &(),
+    ) {
+        return Ok(());
+    }
 
     // As a last resort
     run_command("shutdown", &["-r", "now"])
@@ -129,14 +288,54 @@ pub fn force_reboot() -> ShutdownResult {
 /// - org.freedesktop.login1.Manager.TerminateSession(session_id)
 /// If nothing works up to this point, as a last resort this function calls `loginctl kill-session $XDG_SESSION_ID`
 pub fn logout() -> ShutdownResult {
-    if dbus_send("org.gnome.SessionManager",  "/org/gnome/SessionManager",  "org.gnome.SessionManager",       "Logout",           &(1))           { return Ok(()); } // 1 - no confirmation dialog, 2 - force logout
-    if dbus_send("org.kde.ksmserver",         "/KSMServer",                 "org.kde.KSMServerInterface",     "logout",           &(-1, 0, 2))    { return Ok(()); }
-    if dbus_send("org.kde.ksmserver",         "/KSMServer",                 "org.kde.KSMServerInterface",     "closeSession",     &())            { return Ok(()); }
-    if dbus_send("org.xfce.SessionManager",   "/org/xfce/SessionManager",   "org.xfce.SessionManager",        "Logout",           &(true, true))  { return Ok(()); } // show_dialog - true, allow_save - true
+    if dbus_send(
+        "org.gnome.SessionManager",
+        "/org/gnome/SessionManager",
+        "org.gnome.SessionManager",
+        "Logout",
+        &(1),
+    ) {
+        return Ok(());
+    } // 1 - no confirmation dialog, 2 - force logout
+    if dbus_send(
+        "org.kde.ksmserver",
+        "/KSMServer",
+        "org.kde.KSMServerInterface",
+        "logout",
+        &(-1, 0, 2),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.kde.ksmserver",
+        "/KSMServer",
+        "org.kde.KSMServerInterface",
+        "closeSession",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.xfce.SessionManager",
+        "/org/xfce/SessionManager",
+        "org.xfce.SessionManager",
+        "Logout",
+        &(true, true),
+    ) {
+        return Ok(());
+    } // show_dialog - true, allow_save - true
 
     let session_id = get_session_id();
     if !session_id.is_empty() {
-        if dbus_send("org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "TerminateSession", &(session_id)) { return Ok(()); }
+        if dbus_send(
+            "org.freedesktop.login1",
+            "/org/freedesktop/login1",
+            "org.freedesktop.login1.Manager",
+            "TerminateSession",
+            &(session_id),
+        ) {
+            return Ok(());
+        }
     }
 
     // As a last resort
@@ -156,10 +355,42 @@ pub fn force_logout() -> ShutdownResult {
 /// - org.freedesktop.Hal.Device.SystemPowerManagement.Suspend()
 /// If nothing works up to this point, as a last resort this function calls `systemctl suspend`
 pub fn sleep() -> ShutdownResult {
-    if dbus_send("org.xfce.SessionManager", "/org/xfce/SessionManager",              "org.xfce.SessionManager",                          "Suspend", &())     { return Ok(()); }
-    if dbus_send("org.freedesktop.login1",  "/org/freedesktop/login1",               "org.freedesktop.login1.Manager",                   "Suspend", &(true)) { return Ok(()); } // interactive - true
-    if dbus_send("org.freedesktop.UPower",  "/org/freedesktop/UPower",               "org.freedesktop.UPower",                           "Suspend", &())     { return Ok(()); }
-    if dbus_send("org.freedesktop.Hal",     "/org/freedesktop/Hal/devices/computer", "org.freedesktop.Hal.Device.SystemPowerManagement", "Suspend", &())     { return Ok(()); }
+    if dbus_send(
+        "org.xfce.SessionManager",
+        "/org/xfce/SessionManager",
+        "org.xfce.SessionManager",
+        "Suspend",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        "org.freedesktop.login1.Manager",
+        "Suspend",
+        &(true),
+    ) {
+        return Ok(());
+    } // interactive - true
+    if dbus_send(
+        "org.freedesktop.UPower",
+        "/org/freedesktop/UPower",
+        "org.freedesktop.UPower",
+        "Suspend",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.Hal",
+        "/org/freedesktop/Hal/devices/computer",
+        "org.freedesktop.Hal.Device.SystemPowerManagement",
+        "Suspend",
+        &(),
+    ) {
+        return Ok(());
+    }
 
     // As a last resort
     run_command("systemctl", &["suspend"])
@@ -173,10 +404,42 @@ pub fn sleep() -> ShutdownResult {
 /// - org.freedesktop.Hal.Device.SystemPowerManagement.Hibernate()
 /// If nothing works up to this point, as a last resort this function calls `systemctl hibernate`
 pub fn hibernate() -> ShutdownResult {
-    if dbus_send("org.xfce.SessionManager", "/org/xfce/SessionManager",              "org.xfce.SessionManager",                          "Hibernate", &())     { return Ok(()); }
-    if dbus_send("org.freedesktop.login1",  "/org/freedesktop/login1",               "org.freedesktop.login1.Manager",                   "Hibernate", &(true)) { return Ok(()); } // interactive - true
-    if dbus_send("org.freedesktop.UPower",  "/org/freedesktop/UPower",               "org.freedesktop.UPower",                           "Hibernate", &())     { return Ok(()); }
-    if dbus_send("org.freedesktop.Hal",     "/org/freedesktop/Hal/devices/computer", "org.freedesktop.Hal.Device.SystemPowerManagement", "Hibernate", &())     { return Ok(()); }
+    if dbus_send(
+        "org.xfce.SessionManager",
+        "/org/xfce/SessionManager",
+        "org.xfce.SessionManager",
+        "Hibernate",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        "org.freedesktop.login1.Manager",
+        "Hibernate",
+        &(true),
+    ) {
+        return Ok(());
+    } // interactive - true
+    if dbus_send(
+        "org.freedesktop.UPower",
+        "/org/freedesktop/UPower",
+        "org.freedesktop.UPower",
+        "Hibernate",
+        &(),
+    ) {
+        return Ok(());
+    }
+    if dbus_send(
+        "org.freedesktop.Hal",
+        "/org/freedesktop/Hal/devices/computer",
+        "org.freedesktop.Hal.Device.SystemPowerManagement",
+        "Hibernate",
+        &(),
+    ) {
+        return Ok(());
+    }
 
     // As a last resort
     run_command("systemctl", &["hibernate"])

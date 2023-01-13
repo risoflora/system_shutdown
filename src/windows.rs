@@ -1,24 +1,25 @@
 use std::io::Error;
 use std::mem;
 use windows::{
-    core::{PCWSTR, HSTRING},
+    core::{HSTRING, PCWSTR},
     Win32::{
-        Foundation::{HANDLE, BOOLEAN},
+        Foundation::{BOOLEAN, HANDLE},
+        Security::{
+            AdjustTokenPrivileges, LookupPrivilegeValueW, SE_PRIVILEGE_ENABLED,
+            TOKEN_ADJUST_PRIVILEGES, TOKEN_PRIVILEGES, TOKEN_QUERY,
+        },
         System::{
-            Threading::{GetCurrentProcess, OpenProcessToken},
-            SystemServices::SE_SHUTDOWN_NAME,
             Power::SetSuspendState,
             Shutdown::{
                 ExitWindowsEx, InitiateSystemShutdownW, EWX_LOGOFF, EWX_REBOOT, EWX_SHUTDOWN,
-                SHTDN_REASON_FLAG_PLANNED, SHTDN_REASON_MAJOR_OPERATINGSYSTEM, SHTDN_REASON_MINOR_UPGRADE, EXIT_WINDOWS_FLAGS
-            }
+                EXIT_WINDOWS_FLAGS, SHTDN_REASON_FLAG_PLANNED, SHTDN_REASON_MAJOR_OPERATINGSYSTEM,
+                SHTDN_REASON_MINOR_UPGRADE,
+            },
+            SystemServices::SE_SHUTDOWN_NAME,
+            Threading::{GetCurrentProcess, OpenProcessToken},
         },
-        Security::{
-            LookupPrivilegeValueW, AdjustTokenPrivileges, SE_PRIVILEGE_ENABLED, TOKEN_ADJUST_PRIVILEGES,
-            TOKEN_PRIVILEGES, TOKEN_QUERY,
-        },
-        UI::WindowsAndMessaging::{EWX_FORCE, EWX_FORCEIFHUNG}
-    }
+        UI::WindowsAndMessaging::{EWX_FORCE, EWX_FORCEIFHUNG},
+    },
 };
 
 use super::ShutdownResult;
@@ -35,10 +36,22 @@ fn request_privileges() -> ShutdownResult {
     unsafe {
         let mut token: HANDLE = HANDLE::default();
         let mut tkp: TOKEN_PRIVILEGES = mem::zeroed();
-        if !OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &mut token).as_bool() {
+        if !OpenProcessToken(
+            GetCurrentProcess(),
+            TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
+            &mut token,
+        )
+        .as_bool()
+        {
             return last_os_error!();
         }
-        if !LookupPrivilegeValueW(PCWSTR::null(), SE_SHUTDOWN_NAME, &mut tkp.Privileges[0].Luid).as_bool() {
+        if !LookupPrivilegeValueW(
+            PCWSTR::null(),
+            SE_SHUTDOWN_NAME,
+            &mut tkp.Privileges[0].Luid,
+        )
+        .as_bool()
+        {
             return last_os_error!();
         }
         tkp.PrivilegeCount = 1;
@@ -55,18 +68,34 @@ fn exit_windows(flag: u32) -> ShutdownResult {
         request_privileges()?;
         if !ExitWindowsEx(
             EXIT_WINDOWS_FLAGS(flag | EWX_FORCEIFHUNG),
-            SHTDN_REASON_MAJOR_OPERATINGSYSTEM | SHTDN_REASON_MINOR_UPGRADE | SHTDN_REASON_FLAG_PLANNED
-        ).as_bool()
+            SHTDN_REASON_MAJOR_OPERATINGSYSTEM
+                | SHTDN_REASON_MINOR_UPGRADE
+                | SHTDN_REASON_FLAG_PLANNED,
+        )
+        .as_bool()
         {
             return last_os_error!();
         }
     }
     Ok(())
 }
-fn initiate_system_shutdown(message: &str, timeout: u32, force_close_apps: bool, restart: bool) -> ShutdownResult {
+fn initiate_system_shutdown(
+    message: &str,
+    timeout: u32,
+    force_close_apps: bool,
+    restart: bool,
+) -> ShutdownResult {
     unsafe {
         request_privileges()?;
-        if !InitiateSystemShutdownW(PCWSTR::null(), PCWSTR(HSTRING::from(message).as_ptr()), timeout, force_close_apps, restart).as_bool() {
+        if !InitiateSystemShutdownW(
+            PCWSTR::null(),
+            PCWSTR(HSTRING::from(message).as_ptr()),
+            timeout,
+            force_close_apps,
+            restart,
+        )
+        .as_bool()
+        {
             return last_os_error!();
         }
     }
@@ -84,7 +113,11 @@ fn set_suspend_state(hibernate: bool) -> ShutdownResult {
 
 /// Windows specific function to gracefully request system shutdown, providing a way to show a message,
 /// set a timeout and specify if apps should be force-closed
-pub fn shutdown_with_message(message: &str, timeout: u32, force_close_apps: bool) -> ShutdownResult {
+pub fn shutdown_with_message(
+    message: &str,
+    timeout: u32,
+    force_close_apps: bool,
+) -> ShutdownResult {
     initiate_system_shutdown(message, timeout, force_close_apps, false)
 }
 

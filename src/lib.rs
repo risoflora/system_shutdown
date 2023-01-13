@@ -1,6 +1,6 @@
 //! `system_shutdown` provides a cross platform way to shut down, reboot or log out operations.
 //!
-//! Supported platforms: Linux, Windows and MacOS.
+//! Supported platforms: Linux, Windows and macOS.
 //!
 //! # Example
 //!
@@ -33,7 +33,7 @@ pub use os::request_permission_dialog;
 #[path = "windows.rs"]
 mod os;
 #[cfg(target_os = "windows")]
-pub use os::{shutdown_with_message, reboot_with_message};
+pub use os::{reboot_with_message, shutdown_with_message};
 
 use std::io;
 
