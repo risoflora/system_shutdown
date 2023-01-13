@@ -66,7 +66,7 @@ fn exit_windows(flag: u32) -> ShutdownResult {
 fn initiate_system_shutdown(message: &str, timeout: u32, force_close_apps: bool, restart: bool) -> ShutdownResult {
     unsafe {
         request_privileges()?;
-        if !InitiateSystemShutdownW(PCWSTR::null(), PCWSTR::from(&HSTRING::from(message)), timeout, force_close_apps, restart).as_bool() {
+        if !InitiateSystemShutdownW(PCWSTR::null(), PCWSTR(HSTRING::from(message).as_ptr()), timeout, force_close_apps, restart).as_bool() {
             return last_os_error!();
         }
     }
