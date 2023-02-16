@@ -15,7 +15,7 @@ Add this to your `Cargo.toml`:
 
 ```ini
 [dependencies]
-lock_keys = "*"
+system_shutdown = "*"
 ```
 
 and then:
