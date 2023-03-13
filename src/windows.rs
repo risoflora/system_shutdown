@@ -5,7 +5,7 @@ use windows::{
     Win32::{
         Foundation::{BOOLEAN, HANDLE},
         Security::{
-            AdjustTokenPrivileges, LookupPrivilegeValueW, SE_PRIVILEGE_ENABLED,
+            AdjustTokenPrivileges, LookupPrivilegeValueW, SE_PRIVILEGE_ENABLED, SE_SHUTDOWN_NAME,
             TOKEN_ADJUST_PRIVILEGES, TOKEN_PRIVILEGES, TOKEN_QUERY,
         },
         System::{
@@ -15,7 +15,6 @@ use windows::{
                 EXIT_WINDOWS_FLAGS, SHTDN_REASON_FLAG_PLANNED, SHTDN_REASON_MAJOR_OPERATINGSYSTEM,
                 SHTDN_REASON_MINOR_UPGRADE,
             },
-            SystemServices::SE_SHUTDOWN_NAME,
             Threading::{GetCurrentProcess, OpenProcessToken},
         },
         UI::WindowsAndMessaging::{EWX_FORCE, EWX_FORCEIFHUNG},
@@ -89,7 +88,7 @@ fn initiate_system_shutdown(
         request_privileges()?;
         if !InitiateSystemShutdownW(
             PCWSTR::null(),
-            PCWSTR(HSTRING::from(message).as_ptr()),
+            &HSTRING::from(message),
             timeout,
             force_close_apps,
             restart,
