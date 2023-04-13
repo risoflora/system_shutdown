@@ -32,6 +32,17 @@ fn dbus_send<B: Serialize + DynamicType>(
     if name_has_owner(destination) {
         if let Ok(conn) = zbus::blocking::Connection::session() {
             let reply = conn.call_method(Some(destination), path, Some(interface), method, body);
+            if let Err(e) = &reply {
+                if let zbus::Error::MethodError(name, _, _) = e {
+                    let error_str = name.as_str();
+                    if error_str.contains("org.gtk.GDBus.UnmappedGError.Quark")
+                        && error_str.contains(".Code19")
+                    {
+                        // Code 19 is G_IO_ERROR_CANCELLED
+                        return true;
+                    }
+                }
+            }
             return reply.is_ok();
         }
     }
