@@ -40,7 +40,7 @@ fn request_privileges() -> ShutdownResult {
             TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
             &mut token,
         )
-        .as_bool()
+        .is_ok()
         {
             return last_os_error!();
         }
@@ -49,13 +49,13 @@ fn request_privileges() -> ShutdownResult {
             SE_SHUTDOWN_NAME,
             &mut tkp.Privileges[0].Luid,
         )
-        .as_bool()
+        .is_ok()
         {
             return last_os_error!();
         }
         tkp.PrivilegeCount = 1;
         tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if !AdjustTokenPrivileges(token, false, Some(&tkp), 0, None, None).as_bool() {
+        if !AdjustTokenPrivileges(token, false, Some(&tkp), 0, None, None).is_ok() {
             return last_os_error!();
         }
     }
@@ -71,7 +71,7 @@ fn exit_windows(flag: u32) -> ShutdownResult {
                 | SHTDN_REASON_MINOR_UPGRADE
                 | SHTDN_REASON_FLAG_PLANNED,
         )
-        .as_bool()
+        .is_ok()
         {
             return last_os_error!();
         }
@@ -93,7 +93,7 @@ fn initiate_system_shutdown(
             force_close_apps,
             restart,
         )
-        .as_bool()
+        .is_ok()
         {
             return last_os_error!();
         }
