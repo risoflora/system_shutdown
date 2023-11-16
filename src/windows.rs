@@ -13,11 +13,10 @@ use windows::{
             Shutdown::{
                 ExitWindowsEx, InitiateSystemShutdownW, EWX_LOGOFF, EWX_REBOOT, EWX_SHUTDOWN,
                 EXIT_WINDOWS_FLAGS, SHTDN_REASON_FLAG_PLANNED, SHTDN_REASON_MAJOR_OPERATINGSYSTEM,
-                SHTDN_REASON_MINOR_UPGRADE,
+                SHTDN_REASON_MINOR_UPGRADE, EWX_FORCE, EWX_FORCEIFHUNG
             },
             Threading::{GetCurrentProcess, OpenProcessToken},
-        },
-        UI::WindowsAndMessaging::{EWX_FORCE, EWX_FORCEIFHUNG},
+        }
     },
 };
 
@@ -66,7 +65,7 @@ fn exit_windows(flag: u32) -> ShutdownResult {
     unsafe {
         request_privileges()?;
         if !ExitWindowsEx(
-            EXIT_WINDOWS_FLAGS(flag | EWX_FORCEIFHUNG),
+            EXIT_WINDOWS_FLAGS(flag | EWX_FORCEIFHUNG.0),
             SHTDN_REASON_MAJOR_OPERATINGSYSTEM
                 | SHTDN_REASON_MINOR_UPGRADE
                 | SHTDN_REASON_FLAG_PLANNED,
@@ -133,7 +132,7 @@ pub fn shutdown() -> ShutdownResult {
 
 /// Windows specific function to shut down the machine instantly without confirmations using the `ExitWindowsEx()` from `winuser` API.
 pub fn force_shutdown() -> ShutdownResult {
-    exit_windows(EWX_SHUTDOWN.0 | EWX_FORCE)
+    exit_windows(EWX_SHUTDOWN.0 | EWX_FORCE.0)
 }
 
 /// Windows specific function to reboot the machine using the `ExitWindowsEx()` from `winuser` API.
@@ -143,7 +142,7 @@ pub fn reboot() -> ShutdownResult {
 
 /// Windows specific function to reboot the machine instantly without confirmations using the `ExitWindowsEx()` from `winuser` API.
 pub fn force_reboot() -> ShutdownResult {
-    exit_windows(EWX_REBOOT.0 | EWX_FORCE)
+    exit_windows(EWX_REBOOT.0 | EWX_FORCE.0)
 }
 
 /// Windows specific function to log out the user using the `ExitWindowsEx()` from `winuser` API.
@@ -153,7 +152,7 @@ pub fn logout() -> ShutdownResult {
 
 /// Windows specific function to log out the user instantly without confirmations using the `ExitWindowsEx()` from `winuser` API.
 pub fn force_logout() -> ShutdownResult {
-    exit_windows(EWX_LOGOFF.0 | EWX_FORCE)
+    exit_windows(EWX_LOGOFF.0 | EWX_FORCE.0)
 }
 
 /// Windows specific function to put the machine to sleep using `SetSuspendState()` API call.

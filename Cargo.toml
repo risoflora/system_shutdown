@@ -21,7 +21,7 @@ edition = '2021'
 "zbus" = "3.14.1"
 
 [target.'cfg(target_os = "windows")'.dependencies.windows]
-version = '0.51.0'
+version = '0.52.0'
 features = [
     'Win32_Foundation',
     'Win32_Security',
@@ -30,5 +30,4 @@ features = [
     'Win32_System_Shutdown',
     'Win32_System_Power',
     'Win32_System_SystemServices',
-    'Win32_UI_WindowsAndMessaging',
 ]
