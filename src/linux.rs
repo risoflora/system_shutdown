@@ -17,7 +17,7 @@ fn name_has_owner(name: &str) -> bool {
             "NameHasOwner",
             &(name),
         );
-        return reply.and_then(|r| r.body()).unwrap_or(false);
+        return reply.and_then(|r| r.body().deserialize()).unwrap_or(false);
     }
     false
 }
