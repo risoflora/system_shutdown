@@ -18,10 +18,10 @@ categories = [
 edition = '2021'
 
 [target.'cfg(target_os = "linux")'.dependencies]
-"zbus" = "4.3.1"
+"zbus" = "5.3.0"
 
 [target.'cfg(target_os = "windows")'.dependencies.windows]
-version = '0.58.0'
+version = '0.59.0'
 features = [
     'Win32_Foundation',
     'Win32_Security',

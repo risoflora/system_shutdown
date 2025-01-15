@@ -3,7 +3,7 @@ use std::mem;
 use windows::{
     core::{HSTRING, PCWSTR},
     Win32::{
-        Foundation::{BOOLEAN, HANDLE},
+        Foundation::HANDLE,
         Security::{
             AdjustTokenPrivileges, LookupPrivilegeValueW, SE_PRIVILEGE_ENABLED, SE_SHUTDOWN_NAME,
             TOKEN_ADJUST_PRIVILEGES, TOKEN_PRIVILEGES, TOKEN_QUERY,
@@ -102,7 +102,7 @@ fn initiate_system_shutdown(
 fn set_suspend_state(hibernate: bool) -> ShutdownResult {
     unsafe {
         request_privileges()?;
-        if SetSuspendState(BOOLEAN::from(hibernate), BOOLEAN(0), BOOLEAN(0)).0 == 0 {
+        if !SetSuspendState(hibernate, false, false) {
             return last_os_error!();
         }
     }
