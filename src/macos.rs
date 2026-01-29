@@ -10,7 +10,7 @@ fn invoke_script(script: &str) -> ShutdownResult {
     cmd.args(&["-e", script]);
     match cmd.output() {
         Ok(output) => {
-            if output.status.success() && output.stderr.is_empty() {
+            if output.status.success() {
                 return Ok(());
             }
             Err(Error::new(
