@@ -59,7 +59,7 @@ fn run_command(command: &str, args: &[&str]) -> ShutdownResult {
             }
             Err(Error::new(
                 ErrorKind::Other,
-                String::from_utf8(output.stderr).unwrap(),
+                String::from_utf8_lossy(&output.stderr).into_owned(),
             ))
         }
         Err(error) => Err(error),
