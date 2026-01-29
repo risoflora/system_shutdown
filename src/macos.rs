@@ -35,9 +35,16 @@ pub fn shutdown() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to shut down")
 }
 
-#[doc(hidden)]
+/// macOS specific function to force shut down the system using `shutdown -h now`.
 pub fn force_shutdown() -> ShutdownResult {
-    not_implemented!()
+    let output = Command::new("shutdown").args(["-h", "now"]).output()?;
+    if output.status.success() {
+        return Ok(());
+    }
+    Err(Error::new(
+        ErrorKind::Other,
+        String::from_utf8_lossy(&output.stderr).into_owned(),
+    ))
 }
 
 /// macOS specific function to reboot using AppleScript and "System Events" call "restart"
