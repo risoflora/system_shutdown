@@ -337,16 +337,21 @@ pub fn logout() -> ShutdownResult {
     } // show_dialog - true, allow_save - true
 
     let session_id = get_session_id();
-    if !session_id.is_empty() {
-        if dbus_send(
-            "org.freedesktop.login1",
-            "/org/freedesktop/login1",
-            "org.freedesktop.login1.Manager",
-            "TerminateSession",
-            &(session_id),
-        ) {
-            return Ok(());
-        }
+    if session_id.is_empty() {
+        return Err(Error::new(
+            ErrorKind::Other,
+            "could not determine session ID for logout",
+        ));
+    }
+
+    if dbus_send(
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        "org.freedesktop.login1.Manager",
+        "TerminateSession",
+        &session_id,
+    ) {
+        return Ok(());
     }
 
     // As a last resort
