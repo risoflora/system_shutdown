@@ -54,12 +54,12 @@ fn run_command(command: &str, args: &[&str]) -> ShutdownResult {
     cmd.args(args);
     match cmd.output() {
         Ok(output) => {
-            if output.status.success() && output.stderr.is_empty() {
+            if output.status.success() {
                 return Ok(());
             }
             Err(Error::new(
                 ErrorKind::Other,
-                String::from_utf8(output.stderr).unwrap(),
+                String::from_utf8_lossy(&output.stderr).into_owned(),
             ))
         }
         Err(error) => Err(error),
@@ -337,16 +337,21 @@ pub fn logout() -> ShutdownResult {
     } // show_dialog - true, allow_save - true
 
     let session_id = get_session_id();
-    if !session_id.is_empty() {
-        if dbus_send(
-            "org.freedesktop.login1",
-            "/org/freedesktop/login1",
-            "org.freedesktop.login1.Manager",
-            "TerminateSession",
-            &(session_id),
-        ) {
-            return Ok(());
-        }
+    if session_id.is_empty() {
+        return Err(Error::new(
+            ErrorKind::Other,
+            "could not determine session ID for logout",
+        ));
+    }
+
+    if dbus_send(
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        "org.freedesktop.login1.Manager",
+        "TerminateSession",
+        &(session_id.clone()),
+    ) {
+        return Ok(());
     }
 
     // As a last resort

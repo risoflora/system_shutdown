@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::{Error, ErrorKind, Write};
+use std::io::{Error, ErrorKind};
 use std::process::Command;
 
 use super::not_implemented;
@@ -10,12 +9,12 @@ fn invoke_script(script: &str) -> ShutdownResult {
     cmd.args(&["-e", script]);
     match cmd.output() {
         Ok(output) => {
-            if output.status.success() && output.stderr.is_empty() {
+            if output.status.success() {
                 return Ok(());
             }
             Err(Error::new(
                 ErrorKind::Other,
-                String::from_utf8(output.stderr).unwrap(),
+                String::from_utf8_lossy(&output.stderr).into_owned(),
             ))
         }
         Err(error) => Err(error),
@@ -35,9 +34,16 @@ pub fn shutdown() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to shut down")
 }
 
-#[doc(hidden)]
+/// macOS specific function to force shut down the system using `shutdown -h now`.
 pub fn force_shutdown() -> ShutdownResult {
-    not_implemented!()
+    let output = Command::new("shutdown").args(["-h", "now"]).output()?;
+    if output.status.success() {
+        return Ok(());
+    }
+    Err(Error::new(
+        ErrorKind::Other,
+        String::from_utf8_lossy(&output.stderr).into_owned(),
+    ))
 }
 
 /// macOS specific function to reboot using AppleScript and "System Events" call "restart"
@@ -46,14 +52,16 @@ pub fn reboot() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to restart")
 }
 
-/// Unix specific function to force reboot the machine using the magic SysRq key.
+/// macOS specific function to force reboot the system using `shutdown -r now`.
 pub fn force_reboot() -> ShutdownResult {
-    // Reference: https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html
-    let mut file = File::create("/proc/sys/kernel/sysrq")?;
-    file.write_all(b"128")?;
-    file = File::create("/proc/sysrq-trigger")?;
-    file.write_all(b"b")?;
-    Ok(())
+    let output = Command::new("shutdown").args(["-r", "now"]).output()?;
+    if output.status.success() {
+        return Ok(());
+    }
+    Err(Error::new(
+        ErrorKind::Other,
+        String::from_utf8_lossy(&output.stderr).into_owned(),
+    ))
 }
 
 /// macOS specific function to logout with a confirmation dialog using AppleScript and "System Events" call "log out".
