@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::{Error, ErrorKind, Write};
+use std::io::{Error, ErrorKind};
 use std::process::Command;
 
 use super::not_implemented;
@@ -46,14 +45,16 @@ pub fn reboot() -> ShutdownResult {
     invoke_script("tell application \"System Events\" to restart")
 }
 
-/// Unix specific function to force reboot the machine using the magic SysRq key.
+/// macOS specific function to force reboot the system using `shutdown -r now`.
 pub fn force_reboot() -> ShutdownResult {
-    // Reference: https://www.kernel.org/doc/html/latest/admin-guide/sysrq.html
-    let mut file = File::create("/proc/sys/kernel/sysrq")?;
-    file.write_all(b"128")?;
-    file = File::create("/proc/sysrq-trigger")?;
-    file.write_all(b"b")?;
-    Ok(())
+    let output = Command::new("shutdown").args(["-r", "now"]).output()?;
+    if output.status.success() {
+        return Ok(());
+    }
+    Err(Error::new(
+        ErrorKind::Other,
+        String::from_utf8_lossy(&output.stderr).into_owned(),
+    ))
 }
 
 /// macOS specific function to logout with a confirmation dialog using AppleScript and "System Events" call "log out".
