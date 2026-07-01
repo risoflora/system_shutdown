@@ -54,7 +54,7 @@ fn run_command(command: &str, args: &[&str]) -> ShutdownResult {
     cmd.args(args);
     match cmd.output() {
         Ok(output) => {
-            if output.status.success() && output.stderr.is_empty() {
+            if output.status.success() {
                 return Ok(());
             }
             Err(Error::new(
