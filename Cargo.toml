@@ -18,7 +18,7 @@ categories = [
 edition = '2024'
 
 [target.'cfg(target_os = "linux")'.dependencies]
-"zbus" = "5.13.1"
+"zbus" = "6.1.0"
 
 [target.'cfg(target_os = "windows")'.dependencies.windows]
 version = '0.62'
